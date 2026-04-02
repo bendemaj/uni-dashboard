@@ -11,6 +11,8 @@ import { CourseFormDialog } from "./course-form-dialog"
 import { CourseActionsMenu } from "./course-actions-menu"
 import { Button } from "@/components/ui/button"
 import { GraduationCap, LayoutGrid, List, Plus } from "lucide-react"
+import { CourseImportResult } from "@/lib/import-courses"
+import { toast } from "@/hooks/use-toast"
 
 const STORAGE_KEY = "student-dashboard-courses"
 const CURRENT_SEMESTER_KEY = "student-dashboard-current-semester"
@@ -142,6 +144,43 @@ export function Dashboard() {
     setEditingCourse(null)
   }
 
+  const handleImportComplete = ({ courses, skippedRows, fileName }: CourseImportResult) => {
+    setCourseList(courses)
+    setSelectedSemester("all")
+    setSelectedStatus("all")
+    setSearchQuery("")
+
+    const description = skippedRows > 0
+      ? `${courses.length} courses imported from ${fileName}. ${skippedRows} row${skippedRows === 1 ? "" : "s"} skipped.`
+      : `${courses.length} courses imported from ${fileName}.`
+
+    toast({
+      title: "Import complete",
+      description,
+    })
+  }
+
+  const handleImportError = (message: string) => {
+    toast({
+      title: "Import failed",
+      description: message,
+      variant: "destructive",
+    })
+  }
+
+  const handleClearAllCourses = () => {
+    setCourseList([])
+    setSelectedSemester("all")
+    setSelectedStatus("all")
+    setSearchQuery("")
+    setCurrentSemester("all")
+
+    toast({
+      title: "Table cleared",
+      description: "All courses were removed from the dashboard.",
+    })
+  }
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -185,7 +224,7 @@ export function Dashboard() {
 
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-          <div className="space-y-8">
+        <div className="space-y-8">
           {/* Stats Cards */}
           <StatsCards stats={allStats} />
 
@@ -223,8 +262,12 @@ export function Dashboard() {
             {viewMode === "table" ? (
               <CourseTable
                 courses={filteredCourses}
+                totalCoursesCount={courseList.length}
                 onEditCourse={handleEditCourse}
                 onDeleteCourse={handleDeleteCourse}
+                onImportComplete={handleImportComplete}
+                onImportError={handleImportError}
+                onClearAll={handleClearAllCourses}
               />
             ) : (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
