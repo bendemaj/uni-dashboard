@@ -1,16 +1,18 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { courses as initialCourses, getStats, getSemesters } from "@/lib/courses"
+import { courses as initialCourses, getStats, getSemesters, getGradeDistribution } from "@/lib/courses"
 import { Course, CourseFormValues } from "@/lib/types"
 import { StatsCards } from "./stats-cards"
 import { Filters } from "./filters"
 import { CourseTable } from "./course-table"
 import { SemesterOverview } from "./semester-overview"
+import { GradeDistribution } from "./grade-distribution"
+import { ExamCalendar } from "./exam-calendar"
 import { CourseFormDialog } from "./course-form-dialog"
 import { CourseActionsMenu } from "./course-actions-menu"
 import { Button } from "@/components/ui/button"
-import { Github, GraduationCap, LayoutGrid, List, Plus } from "lucide-react"
+import { Cloud, Github, GraduationCap, Loader2, LogOut, Plus } from "lucide-react"
 import { CourseImportResult } from "@/lib/import-courses"
 import { toast } from "@/hooks/use-toast"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -30,7 +32,6 @@ export function Dashboard() {
   const [searchQuery, setSearchQuery] = useState("")
   const [selectedSemester, setSelectedSemester] = useState("all")
   const [selectedStatus, setSelectedStatus] = useState("all")
-  const [viewMode, setViewMode] = useState<"table" | "cards">("table")
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const [editingCourse, setEditingCourse] = useState<Course | null>(null)
   const [currentSemester, setCurrentSemester] = useState(DEFAULT_CURRENT_SEMESTER)
@@ -196,6 +197,7 @@ export function Dashboard() {
   }, [courseList, searchQuery, selectedSemester, selectedStatus])
 
   const allStats = useMemo(() => getStats(courseList), [courseList])
+  const gradeDistribution = useMemo(() => getGradeDistribution(courseList), [courseList])
 
   const openAddDialog = () => {
     setEditingCourse(null)
@@ -447,17 +449,36 @@ export function Dashboard() {
 
   const showCloudGate = CLOUD_SYNC_ENABLED && authReady && !session
   const showLoadingState = CLOUD_SYNC_ENABLED && (!authReady || !hasLoadedCourses)
-  const effectiveViewMode = isMobile ? "cards" : viewMode
+  const effectiveViewMode = isMobile ? "cards" : "table"
 
   if (showLoadingState) {
     return (
       <div className="min-h-screen bg-background">
-        <main className="mx-auto flex min-h-screen max-w-3xl items-center px-4 py-16 sm:px-6 lg:px-8">
-          <div className="w-full rounded-xl border border-border bg-card p-8">
-            <p className="text-sm font-medium text-foreground">Connecting to cloud sync...</p>
-            <p className="mt-2 text-sm text-muted-foreground">
-              The app is restoring your session and loading your course table.
-            </p>
+        <main className="mx-auto flex min-h-screen max-w-lg items-center px-4 py-16 sm:px-6 lg:px-8">
+          <div className="w-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+            <div className="border-b border-border bg-muted/20 px-6 py-5">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/10">
+                  <Cloud className="h-5 w-5 text-emerald-500" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-foreground">Cloud Sync</p>
+                  <p className="text-xs text-muted-foreground">Restoring your dashboard</p>
+                </div>
+              </div>
+            </div>
+            <div className="px-6 py-7">
+              <div className="flex items-center gap-3">
+                <Loader2 className="h-4 w-4 animate-spin text-emerald-500" />
+                <p className="text-sm font-medium text-foreground">Connecting securely</p>
+              </div>
+              <div className="mt-5 h-2 overflow-hidden rounded-full bg-muted">
+                <div className="h-full w-2/3 rounded-full bg-emerald-500/80" />
+              </div>
+              <p className="mt-4 text-sm text-muted-foreground">
+                Loading your session and course data.
+              </p>
+            </div>
           </div>
         </main>
       </div>
@@ -466,17 +487,46 @@ export function Dashboard() {
 
   if (showCloudGate) {
     return (
-      <div className="min-h-screen bg-background">
-        <main className="mx-auto flex min-h-screen max-w-3xl items-center px-4 py-16 sm:px-6 lg:px-8">
-          <CloudSyncPanel
-            cloudSyncEnabled={CLOUD_SYNC_ENABLED}
-            isLoading={isSyncing}
-            userEmail={null}
-            onSignIn={handleSignIn}
-            onVerifyCode={handleVerifyCode}
-            onSignOut={handleSignOut}
-          />
+      <div className="flex min-h-screen flex-col bg-background">
+        <header className="border-b border-border/70 bg-background/80">
+          <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-5 sm:px-6 lg:px-8">
+            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-foreground">
+              <GraduationCap className="h-5 w-5 text-background" />
+            </div>
+            <div>
+              <h1 className="text-sm font-semibold text-foreground">Uni Dashboard</h1>
+              <p className="text-xs text-muted-foreground">Simple Course Tracking</p>
+            </div>
+          </div>
+        </header>
+
+        <main className="mx-auto flex w-full max-w-3xl flex-1 items-center px-4 py-12 sm:px-6 lg:px-8">
+          <div className="w-full">
+            <CloudSyncPanel
+              cloudSyncEnabled={CLOUD_SYNC_ENABLED}
+              isLoading={isSyncing}
+              userEmail={null}
+              onSignIn={handleSignIn}
+              onVerifyCode={handleVerifyCode}
+              onSignOut={handleSignOut}
+            />
+          </div>
         </main>
+
+        <footer className="border-t border-border/70 bg-background/80">
+          <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-5 text-xs text-muted-foreground sm:px-6 lg:px-8">
+            <p>{new Date().getFullYear()} Uni Dashboard</p>
+            <a
+              href="https://github.com/bendemaj/student-dashboard"
+              target="_blank"
+              rel="noreferrer"
+              className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
+            >
+              <Github className="h-3.5 w-3.5" />
+              <span>Repository</span>
+            </a>
+          </div>
+        </footer>
       </div>
     )
   }
@@ -498,28 +548,28 @@ export function Dashboard() {
                 <p className="text-xs text-muted-foreground">Simple Course Tracking</p>
               </div>
             </div>
-            <div className="hidden items-center gap-1 rounded-lg border border-border p-1 md:flex">
-              <button
-                onClick={() => setViewMode("table")}
-                className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-                  viewMode === "table"
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <List className="h-4 w-4" />
-              </button>
-              <button
-                onClick={() => setViewMode("cards")}
-                className={`flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-                  viewMode === "cards"
-                    ? "bg-foreground text-background"
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                <LayoutGrid className="h-4 w-4" />
-              </button>
-            </div>
+            {currentUserEmail && (
+              <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 sm:gap-3 sm:px-3">
+                <div className="hidden items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 sm:flex">
+                  <Cloud className="h-3.5 w-3.5" />
+                  <span>Sync active</span>
+                </div>
+                <div className="h-4 w-px bg-border hidden sm:block" />
+                <span className="max-w-[150px] truncate text-xs text-muted-foreground sm:max-w-[220px]">
+                  {currentUserEmail}
+                </span>
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon-sm"
+                  onClick={() => void handleSignOut()}
+                  disabled={isSyncing}
+                  aria-label="Sign out"
+                >
+                  <LogOut className="h-4 w-4" />
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       </header>
@@ -527,27 +577,36 @@ export function Dashboard() {
       {/* Main Content */}
       <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="space-y-8">
-          <CloudSyncPanel
-            cloudSyncEnabled={CLOUD_SYNC_ENABLED}
-            isLoading={isSyncing}
-            userEmail={currentUserEmail}
-            onSignIn={handleSignIn}
-            onVerifyCode={handleVerifyCode}
-            onSignOut={handleSignOut}
-          />
+          {!currentUserEmail && (
+            <CloudSyncPanel
+              cloudSyncEnabled={CLOUD_SYNC_ENABLED}
+              isLoading={isSyncing}
+              userEmail={currentUserEmail}
+              onSignIn={handleSignIn}
+              onVerifyCode={handleVerifyCode}
+              onSignOut={handleSignOut}
+            />
+          )}
 
           {/* Stats Cards */}
           <StatsCards stats={allStats} />
 
           {/* Combined Progress Overview */}
-          <div>
-            <SemesterOverview
-              courses={courseList}
-              semesters={semesters}
-              currentSemester={currentSemester}
-              onCurrentSemesterChange={setCurrentSemester}
-            />
+          <div className="grid grid-cols-1 gap-4 lg:grid-cols-5">
+            <div className="lg:col-span-3">
+              <SemesterOverview
+                courses={courseList}
+                semesters={semesters}
+                currentSemester={currentSemester}
+                onCurrentSemesterChange={setCurrentSemester}
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <GradeDistribution data={gradeDistribution} />
+            </div>
           </div>
+
+          <ExamCalendar courses={courseList} />
 
           {/* Courses Section */}
           <div className="space-y-4">
@@ -575,6 +634,7 @@ export function Dashboard() {
                 courses={filteredCourses}
                 totalCoursesCount={courseList.length}
                 onEditCourse={handleEditCourse}
+                onSaveCourse={handleSaveCourse}
                 onDeleteCourse={handleDeleteCourse}
                 onImportComplete={handleImportComplete}
                 onImportError={handleImportError}

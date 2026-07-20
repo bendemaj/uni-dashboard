@@ -160,6 +160,28 @@ function formatDate(date: Date) {
   return `${day}.${month}.${year}`
 }
 
+function normalizeEuropeanDateString(value: string) {
+  const match = value.match(/^(\d{1,2})[./](\d{1,2})[./](\d{4})$/)
+  if (!match) {
+    return null
+  }
+
+  const day = Number(match[1])
+  const month = Number(match[2])
+  const year = Number(match[3])
+  const date = new Date(year, month - 1, day)
+
+  if (
+    date.getFullYear() !== year ||
+    date.getMonth() !== month - 1 ||
+    date.getDate() !== day
+  ) {
+    return null
+  }
+
+  return formatDate(date)
+}
+
 function normalizeExamDate(value: unknown) {
   if (value == null || value === "") {
     return null
@@ -180,7 +202,7 @@ function normalizeExamDate(value: unknown) {
   }
 
   const text = normalizeText(value)
-  return text || null
+  return normalizeEuropeanDateString(text) ?? (text || null)
 }
 
 function buildCourseName(row: RawRow) {
@@ -248,7 +270,9 @@ function readWorkbook(file: File) {
   return file.arrayBuffer().then((buffer) =>
     XLSX.read(buffer, {
       type: "array",
-      cellDates: true,
+      cellDates: false,
+      dateNF: "dd.mm.yyyy",
+      raw: true,
     }),
   )
 }

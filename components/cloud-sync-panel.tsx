@@ -4,6 +4,7 @@ import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp"
+import { Cloud, Loader2, Mail, ShieldCheck } from "lucide-react"
 
 const EMAIL_OTP_LENGTH = 8
 
@@ -108,15 +109,38 @@ export function CloudSyncPanel({
   }
 
   return (
-    <div className="rounded-xl border border-border bg-card p-5">
-      <p className="text-sm font-medium text-foreground">Sign in to sync your course table.</p>
-      <p className="mt-1 text-sm text-muted-foreground">
-        Use the same email on your laptop and phone to share one course database.
-      </p>
+    <div className="w-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
+      <div className="border-b border-border bg-muted/20 px-6 py-5">
+        <div className="flex items-start gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
+            <Cloud className="h-5 w-5 text-emerald-500" />
+          </div>
+          <div>
+            <p className="text-sm font-medium text-foreground">Sync your course table</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Sign in once and keep this dashboard available across your devices.
+            </p>
+          </div>
+        </div>
+        <div className="mt-5 grid gap-2 sm:grid-cols-2">
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-background/70 px-3 py-2 text-xs text-muted-foreground">
+            <ShieldCheck className="h-4 w-4 text-emerald-500" />
+            <span>Email code sign-in</span>
+          </div>
+          <div className="flex items-center gap-2 rounded-lg border border-border bg-background/70 px-3 py-2 text-xs text-muted-foreground">
+            <Cloud className="h-4 w-4 text-emerald-500" />
+            <span>Cloud-backed courses</span>
+          </div>
+        </div>
+      </div>
+      <div className="px-6 py-6">
       {pendingEmail ? (
         <form className="mt-4 flex flex-col gap-4" onSubmit={handleVerify}>
           <div className="space-y-1">
-            <p className="text-sm text-foreground">Enter the {EMAIL_OTP_LENGTH}-digit code sent to {pendingEmail}.</p>
+            <p className="text-sm font-medium text-foreground">Check your email</p>
+            <p className="text-sm text-muted-foreground">
+              Enter the {EMAIL_OTP_LENGTH}-digit code sent to {pendingEmail}.
+            </p>
             <button
               type="button"
               className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
@@ -150,6 +174,7 @@ export function CloudSyncPanel({
           </InputOTP>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Button type="submit" disabled={isLoading || isSubmitting || otpCode.length !== EMAIL_OTP_LENGTH}>
+              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
               {isSubmitting ? "Verifying..." : "Verify code"}
             </Button>
             <Button
@@ -163,20 +188,32 @@ export function CloudSyncPanel({
           </div>
         </form>
       ) : (
-        <form className="mt-4 flex flex-col gap-3 sm:flex-row" onSubmit={handleSubmit}>
-          <Input
-            type="email"
-            value={email}
-            onChange={(event) => setEmail(event.target.value)}
-            placeholder="you@example.com"
-            disabled={isLoading || isSubmitting}
-          />
-          <Button type="submit" disabled={isLoading || isSubmitting}>
-            {isSubmitting ? "Sending code..." : "Email me a sign-in code"}
+        <form className="space-y-4" onSubmit={handleSubmit}>
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground" htmlFor="sync-email">
+              Email address
+            </label>
+            <div className="relative">
+              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                id="sync-email"
+                type="email"
+                value={email}
+                onChange={(event) => setEmail(event.target.value)}
+                placeholder="you@example.com"
+                disabled={isLoading || isSubmitting}
+                className="pl-9"
+              />
+            </div>
+          </div>
+          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading || isSubmitting}>
+            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+            {isSubmitting ? "Sending code..." : "Send sign-in code"}
           </Button>
         </form>
       )}
       {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
+      </div>
     </div>
   )
 }

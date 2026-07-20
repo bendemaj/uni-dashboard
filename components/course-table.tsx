@@ -2,10 +2,12 @@
 
 import { ChangeEvent, DragEvent, Fragment, useRef, useState } from "react"
 import { CourseImportResult, importCoursesFromFile } from "@/lib/import-courses"
-import { Course, GRADE_COLORS, STATUS_COLORS } from "@/lib/types"
+import { Course, CourseFormValues, GRADE_COLORS, GRADE_OPTIONS, STATUS_COLORS } from "@/lib/types"
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog"
 import { Button } from "@/components/ui/button"
 import { CourseActionsMenu } from "@/components/course-actions-menu"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { cn } from "@/lib/utils"
 import { ArrowUpDown, Calendar, ChevronDown, ChevronUp, Trash2, Upload, User } from "lucide-react"
 
@@ -13,6 +15,7 @@ interface CourseTableProps {
   courses: Course[]
   totalCoursesCount: number
   onEditCourse: (course: Course) => void
+  onSaveCourse: (values: CourseFormValues, courseId?: string) => void
   onDeleteCourse: (courseId: string) => void
   onImportComplete: (result: CourseImportResult) => void
   onImportError: (message: string) => void
@@ -28,6 +31,7 @@ export function CourseTable({
   courses,
   totalCoursesCount,
   onEditCourse,
+  onSaveCourse,
   onDeleteCourse,
   onImportComplete,
   onImportError,
@@ -92,6 +96,44 @@ export function CourseTable({
     event.preventDefault()
     const file = event.dataTransfer.files?.[0] ?? null
     void handleImport(file)
+  }
+
+  const getCourseValues = (course: Course, patch: Partial<CourseFormValues> = {}): CourseFormValues => ({
+    name: course.name,
+    credits: course.credits.toString(),
+    semester: course.semester,
+    status: course.status,
+    grade: course.grade ?? "",
+    examDate: course.examDate ?? "",
+    examiner: course.examiner ?? "",
+    ...patch,
+  })
+
+  const saveInlineChange = (course: Course, patch: Partial<CourseFormValues>) => {
+    onSaveCourse(getCourseValues(course, patch), course.id)
+  }
+
+  const saveTextField = (
+    course: Course,
+    field: "name" | "credits" | "semester",
+    value: string
+  ) => {
+    const nextValue = field === "semester" ? value.trim().toUpperCase() : value.trim()
+    const currentValue =
+      field === "credits" ? course.credits.toString() : field === "semester" ? course.semester : course.name
+
+    if (!nextValue || nextValue === currentValue) {
+      return
+    }
+
+    if (field === "credits") {
+      const credits = Number(nextValue)
+      if (Number.isNaN(credits) || credits <= 0) {
+        return
+      }
+    }
+
+    saveInlineChange(course, { [field]: nextValue })
   }
 
   const sortedCourses = [...courses].sort((a, b) => {
@@ -259,41 +301,114 @@ export function CourseTable({
                   >
                     <td className="px-4 py-3.5">
                       <div className="flex flex-col">
-                        <span className="text-sm font-medium text-foreground group-hover:text-foreground/90 line-clamp-2">
-                          {course.name}
-                        </span>
-                        <span className="text-xs text-muted-foreground md:hidden mt-0.5">
-                          {course.semester}
-                        </span>
+                        <Input
+                          defaultValue={course.name}
+                          className="h-8 min-w-[260px] border-transparent bg-transparent px-2 text-sm font-medium shadow-none hover:border-border focus-visible:border-ring"
+                          onClick={(event) => event.stopPropagation()}
+                          onBlur={(event) => saveTextField(course, "name", event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.currentTarget.blur()
+                            }
+                          }}
+                          aria-label={`Course name for ${course.name}`}
+                        />
+                        <Input
+                          defaultValue={course.semester}
+                          className="mt-1 h-7 w-24 border-transparent bg-transparent px-2 font-mono text-xs text-muted-foreground shadow-none hover:border-border focus-visible:border-ring md:hidden"
+                          onClick={(event) => event.stopPropagation()}
+                          onBlur={(event) => saveTextField(course, "semester", event.target.value)}
+                          onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                              event.currentTarget.blur()
+                            }
+                          }}
+                          aria-label={`Semester for ${course.name}`}
+                        />
                       </div>
                     </td>
                     <td className="px-4 py-3.5 hidden md:table-cell">
-                      <span className="text-sm text-foreground font-mono">{course.semester}</span>
+                      <Input
+                        defaultValue={course.semester}
+                        className="h-8 w-24 border-transparent bg-transparent px-2 font-mono text-sm shadow-none hover:border-border focus-visible:border-ring"
+                        onClick={(event) => event.stopPropagation()}
+                        onBlur={(event) => saveTextField(course, "semester", event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.currentTarget.blur()
+                          }
+                        }}
+                        aria-label={`Semester for ${course.name}`}
+                      />
                     </td>
                     <td className="px-4 py-3.5">
-                      <span className="text-sm text-foreground font-medium">{course.credits}</span>
+                      <Input
+                        defaultValue={course.credits.toString()}
+                        inputMode="decimal"
+                        className="h-8 w-20 border-transparent bg-transparent px-2 text-sm font-medium shadow-none hover:border-border focus-visible:border-ring"
+                        onClick={(event) => event.stopPropagation()}
+                        onBlur={(event) => saveTextField(course, "credits", event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.currentTarget.blur()
+                          }
+                        }}
+                        aria-label={`Credits for ${course.name}`}
+                      />
                     </td>
                     <td className="px-4 py-3.5">
-                      <span
-                        className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
-                          STATUS_COLORS[course.status]
-                        }`}
+                      <Select
+                        value={course.status}
+                        onValueChange={(value) =>
+                          saveInlineChange(course, {
+                            status: value as "done" | "pending",
+                            grade: value === "pending" ? "" : course.grade ?? "",
+                          })
+                        }
                       >
-                        {course.status === "done" ? "Completed" : "Pending"}
-                      </span>
+                        <SelectTrigger
+                          size="sm"
+                          className={`h-8 w-[116px] border-transparent px-2 text-xs font-medium shadow-none ${STATUS_COLORS[course.status]}`}
+                          onClick={(event) => event.stopPropagation()}
+                        >
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="done">Completed</SelectItem>
+                          <SelectItem value="pending">Pending</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="px-4 py-3.5 hidden sm:table-cell">
-                      {course.grade ? (
-                        <span
-                          className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium ${
-                            GRADE_COLORS[course.grade] || "bg-muted text-muted-foreground"
+                      <Select
+                        disabled={course.status !== "done"}
+                        value={course.grade ?? "none"}
+                        onValueChange={(value) =>
+                          saveInlineChange(course, {
+                            grade: value === "none" ? "" : value,
+                          })
+                        }
+                      >
+                        <SelectTrigger
+                          size="sm"
+                          className={`h-8 w-[152px] border-transparent px-2 text-xs font-medium shadow-none ${
+                            course.grade
+                              ? GRADE_COLORS[course.grade] || "bg-muted text-muted-foreground"
+                              : "text-muted-foreground"
                           }`}
+                          onClick={(event) => event.stopPropagation()}
                         >
-                          {course.grade}
-                        </span>
-                      ) : (
-                        <span className="text-sm text-muted-foreground">—</span>
-                      )}
+                          <SelectValue placeholder="No grade" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="none">No grade</SelectItem>
+                          {GRADE_OPTIONS.map((grade) => (
+                            <SelectItem key={grade} value={grade}>
+                              {grade}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </td>
                     <td className="px-4 py-3.5">
                       <div className="flex items-center justify-end">

@@ -1,5 +1,20 @@
 import { Course, Stats, GRADE_MAP } from "./types"
 
+export interface GradeDistributionEntry {
+  key: string
+  grade: string
+  label: string
+  count: number
+}
+
+const GRADE_DISTRIBUTION_ORDER: { key: string; grade: string; label: string }[] = [
+  { key: "sehrGut", grade: "sehr gut", label: "Sehr gut" },
+  { key: "gut", grade: "gut", label: "Gut" },
+  { key: "befriedigend", grade: "befriedigend", label: "Befriedigend" },
+  { key: "genuegend", grade: "genügend", label: "Genügend" },
+  { key: "ohneNote", grade: "mit Erfolg teilgenommen", label: "Mit Erfolg" },
+]
+
 export const courses: Course[] = [
   { id: "1", name: "101.679 VO Mathematik 1 für ET", credits: 6.0, semester: "2024W", status: "done", grade: "gut", examDate: "15.05.2025", examiner: "Peter Szmolyan" },
   { id: "2", name: "360.058 VU Einführung in das wissenschaftliche Programmieren", credits: 5.0, semester: "2024W", status: "done", grade: "sehr gut", examDate: "16.01.2025", examiner: "Hajdin Ceric" },
@@ -79,6 +94,15 @@ export function getStats(filteredCourses: Course[]): Stats {
     pendingCourses: pendingCourses.length,
     averageGrade,
   }
+}
+
+export function getGradeDistribution(courseList: Course[]): GradeDistributionEntry[] {
+  return GRADE_DISTRIBUTION_ORDER.map(({ key, grade, label }) => ({
+    key,
+    grade,
+    label,
+    count: courseList.filter((c) => c.grade === grade).length,
+  }))
 }
 
 export function getSemesters(courseList: Course[]): string[] {
