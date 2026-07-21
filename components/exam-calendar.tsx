@@ -83,8 +83,8 @@ export function ExamCalendar({ courses }: ExamCalendarProps) {
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <div className="rounded-xl border border-border bg-card">
-        <div className="flex flex-col gap-3 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
+        <div className="flex flex-col gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+          <div className="min-w-0">
             <div className="flex items-center gap-2">
               <CalendarDays className="h-4 w-4 text-emerald-500" />
               <h3 className="text-sm font-medium text-foreground">Exam Calendar</h3>
@@ -95,10 +95,10 @@ export function ExamCalendar({ courses }: ExamCalendarProps) {
                 : `${passedExams.length} passed exams across ${years.length} year${years.length === 1 ? "" : "s"}`}
             </p>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="grid grid-cols-1 gap-2 min-[420px]:flex min-[420px]:items-center">
             {years.length > 0 && isOpen && (
               <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-[128px]" size="sm">
+                <SelectTrigger className="w-full min-[420px]:w-[128px]" size="sm">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent align="end">
@@ -111,21 +111,21 @@ export function ExamCalendar({ courses }: ExamCalendarProps) {
                 </SelectContent>
               </Select>
             )}
-            <CollapsibleTrigger className="inline-flex items-center gap-1 rounded-md px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground">
+            <CollapsibleTrigger className="inline-flex h-8 items-center justify-center gap-1 rounded-md border border-border px-2 py-1 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground min-[420px]:border-0">
               {isOpen ? "Hide calendar" : "Show calendar"}
               <ChevronDown className={`h-4 w-4 transition-transform ${isOpen ? "rotate-180" : ""}`} />
             </CollapsibleTrigger>
           </div>
         </div>
 
-        <CollapsibleContent className="border-t border-border px-5 py-5">
+        <CollapsibleContent className="border-t border-border px-4 py-4 sm:px-5 sm:py-5">
           {years.length === 0 ? (
-        <div className="flex min-h-[160px] items-center justify-center rounded-lg bg-muted/30 text-sm text-muted-foreground">
-          No passed exams with dates yet.
-        </div>
-      ) : (
-        <div className="grid gap-5 lg:grid-cols-[1fr_320px]">
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-4">
+            <div className="flex min-h-[160px] items-center justify-center rounded-lg bg-muted/30 text-sm text-muted-foreground">
+              No passed exams with dates yet.
+            </div>
+          ) : (
+            <div className="grid gap-4 lg:grid-cols-[1fr_320px] lg:gap-5">
+              <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 xl:grid-cols-4">
             {monthLabels.map((month, index) => {
               const exams = examsByMonth[index]
               const intensity = exams.length / busiestMonth
@@ -166,7 +166,7 @@ export function ExamCalendar({ courses }: ExamCalendarProps) {
             })}
           </div>
 
-          <div className="rounded-lg border border-border bg-muted/20">
+              <div className="rounded-lg border border-border bg-muted/20">
             <div className="border-b border-border px-4 py-3">
               <p className="text-sm font-medium text-foreground">{activeYear} passed exams</p>
               <p className="mt-1 text-xs text-muted-foreground">
@@ -207,8 +207,8 @@ export function ExamCalendar({ courses }: ExamCalendarProps) {
                 ))
               )}
             </div>
-          </div>
-        </div>
+              </div>
+            </div>
           )}
         </CollapsibleContent>
       </div>

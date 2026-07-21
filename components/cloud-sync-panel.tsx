@@ -110,12 +110,12 @@ export function CloudSyncPanel({
 
   return (
     <div className="w-full overflow-hidden rounded-xl border border-border bg-card shadow-sm">
-      <div className="border-b border-border bg-muted/20 px-6 py-5">
+      <div className="border-b border-border bg-muted/20 px-4 py-5 sm:px-6">
         <div className="flex items-start gap-3">
           <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-emerald-500/10">
             <Cloud className="h-5 w-5 text-emerald-500" />
           </div>
-          <div>
+          <div className="min-w-0">
             <p className="text-sm font-medium text-foreground">Sync your course table</p>
             <p className="mt-1 text-sm text-muted-foreground">
               Sign in once and keep this dashboard available across your devices.
@@ -133,86 +133,88 @@ export function CloudSyncPanel({
           </div>
         </div>
       </div>
-      <div className="px-6 py-6">
-      {pendingEmail ? (
-        <form className="mt-4 flex flex-col gap-4" onSubmit={handleVerify}>
-          <div className="space-y-1">
-            <p className="text-sm font-medium text-foreground">Check your email</p>
-            <p className="text-sm text-muted-foreground">
-              Enter the {EMAIL_OTP_LENGTH}-digit code sent to {pendingEmail}.
-            </p>
-            <button
-              type="button"
-              className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
-              onClick={() => {
-                setPendingEmail("")
-                setOtpCode("")
-                setError(null)
-                setEmail(pendingEmail)
-              }}
-            >
-              Use a different email
-            </button>
-          </div>
-          <InputOTP
-            maxLength={EMAIL_OTP_LENGTH}
-            value={otpCode}
-            onChange={setOtpCode}
-            disabled={isLoading || isSubmitting}
-            containerClassName="justify-start"
-          >
-            <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
-              <InputOTPSlot index={6} />
-              <InputOTPSlot index={7} />
-            </InputOTPGroup>
-          </InputOTP>
-          <div className="flex flex-col gap-3 sm:flex-row">
-            <Button type="submit" disabled={isLoading || isSubmitting || otpCode.length !== EMAIL_OTP_LENGTH}>
-              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-              {isSubmitting ? "Verifying..." : "Verify code"}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              disabled={isLoading || isSubmitting}
-              onClick={() => void requestCode(pendingEmail)}
-            >
-              Resend code
-            </Button>
-          </div>
-        </form>
-      ) : (
-        <form className="space-y-4" onSubmit={handleSubmit}>
-          <div className="space-y-2">
-            <label className="text-sm font-medium text-foreground" htmlFor="sync-email">
-              Email address
-            </label>
-            <div className="relative">
-              <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                id="sync-email"
-                type="email"
-                value={email}
-                onChange={(event) => setEmail(event.target.value)}
-                placeholder="you@example.com"
-                disabled={isLoading || isSubmitting}
-                className="pl-9"
-              />
+      <div className="px-4 py-5 sm:px-6 sm:py-6">
+        {pendingEmail ? (
+          <form className="flex flex-col gap-4" onSubmit={handleVerify}>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-foreground">Check your email</p>
+              <p className="break-words text-sm text-muted-foreground">
+                Enter the {EMAIL_OTP_LENGTH}-digit code sent to {pendingEmail}.
+              </p>
+              <button
+                type="button"
+                className="text-sm text-muted-foreground underline-offset-4 transition-colors hover:text-foreground hover:underline"
+                onClick={() => {
+                  setPendingEmail("")
+                  setOtpCode("")
+                  setError(null)
+                  setEmail(pendingEmail)
+                }}
+              >
+                Use a different email
+              </button>
             </div>
-          </div>
-          <Button type="submit" className="w-full sm:w-auto" disabled={isLoading || isSubmitting}>
-            {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
-            {isSubmitting ? "Sending code..." : "Send sign-in code"}
-          </Button>
-        </form>
-      )}
-      {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
+            <div className="overflow-x-auto pb-1">
+              <InputOTP
+                maxLength={EMAIL_OTP_LENGTH}
+                value={otpCode}
+                onChange={setOtpCode}
+                disabled={isLoading || isSubmitting}
+                containerClassName="justify-start"
+              >
+                <InputOTPGroup>
+                  <InputOTPSlot index={0} />
+                  <InputOTPSlot index={1} />
+                  <InputOTPSlot index={2} />
+                  <InputOTPSlot index={3} />
+                  <InputOTPSlot index={4} />
+                  <InputOTPSlot index={5} />
+                  <InputOTPSlot index={6} />
+                  <InputOTPSlot index={7} />
+                </InputOTPGroup>
+              </InputOTP>
+            </div>
+            <div className="flex flex-col gap-3 sm:flex-row">
+              <Button type="submit" disabled={isLoading || isSubmitting || otpCode.length !== EMAIL_OTP_LENGTH}>
+                {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+                {isSubmitting ? "Verifying..." : "Verify code"}
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                disabled={isLoading || isSubmitting}
+                onClick={() => void requestCode(pendingEmail)}
+              >
+                Resend code
+              </Button>
+            </div>
+          </form>
+        ) : (
+          <form className="space-y-4" onSubmit={handleSubmit}>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground" htmlFor="sync-email">
+                Email address
+              </label>
+              <div className="relative">
+                <Mail className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  id="sync-email"
+                  type="email"
+                  value={email}
+                  onChange={(event) => setEmail(event.target.value)}
+                  placeholder="you@example.com"
+                  disabled={isLoading || isSubmitting}
+                  className="pl-9"
+                />
+              </div>
+            </div>
+            <Button type="submit" className="w-full sm:w-auto" disabled={isLoading || isSubmitting}>
+              {isSubmitting && <Loader2 className="h-4 w-4 animate-spin" />}
+              {isSubmitting ? "Sending code..." : "Send sign-in code"}
+            </Button>
+          </form>
+        )}
+        {error ? <p className="mt-3 text-sm text-destructive">{error}</p> : null}
       </div>
     </div>
   )

@@ -12,7 +12,7 @@ import { ExamCalendar } from "./exam-calendar"
 import { CourseFormDialog } from "./course-form-dialog"
 import { CourseActionsMenu } from "./course-actions-menu"
 import { Button } from "@/components/ui/button"
-import { Cloud, Github, GraduationCap, Loader2, LogOut, Plus } from "lucide-react"
+import { Cloud, Github, GraduationCap, Loader2, LogOut } from "lucide-react"
 import { CourseImportResult } from "@/lib/import-courses"
 import { toast } from "@/hooks/use-toast"
 import { useIsMobile } from "@/hooks/use-mobile"
@@ -489,13 +489,13 @@ export function Dashboard() {
     return (
       <div className="flex min-h-screen flex-col bg-background">
         <header className="border-b border-border/70 bg-background/80">
-          <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-5 sm:px-6 lg:px-8">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-foreground">
+          <div className="mx-auto flex max-w-3xl items-center gap-3 px-4 py-4 sm:px-6 sm:py-5 lg:px-8">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-foreground">
               <GraduationCap className="h-5 w-5 text-background" />
             </div>
-            <div>
-              <h1 className="text-sm font-semibold text-foreground">Uni Dashboard</h1>
-              <p className="text-xs text-muted-foreground">Simple Course Tracking</p>
+            <div className="min-w-0">
+              <h1 className="truncate text-sm font-semibold text-foreground">Uni Dashboard</h1>
+              <p className="truncate text-xs text-muted-foreground">Simple Course Tracking</p>
             </div>
           </div>
         </header>
@@ -514,7 +514,7 @@ export function Dashboard() {
         </main>
 
         <footer className="border-t border-border/70 bg-background/80">
-          <div className="mx-auto flex max-w-3xl items-center justify-between gap-4 px-4 py-5 text-xs text-muted-foreground sm:px-6 lg:px-8">
+          <div className="mx-auto flex max-w-3xl flex-col gap-3 px-4 py-5 text-xs text-muted-foreground min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between sm:px-6 lg:px-8">
             <p>{new Date().getFullYear()} Uni Dashboard</p>
             <a
               href="https://github.com/bendemaj/student-dashboard"
@@ -538,24 +538,24 @@ export function Dashboard() {
       {/* Header */}
       <header className="sticky top-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
-          <div className="flex h-16 items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-foreground">
+          <div className="flex min-h-16 items-center justify-between gap-3 py-2">
+            <div className="flex min-w-0 items-center gap-3">
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-foreground">
                 <GraduationCap className="h-5 w-5 text-background" />
               </div>
-              <div>
-                <h1 className="text-lg font-semibold text-foreground">Uni Dashboard</h1>
-                <p className="text-xs text-muted-foreground">Simple Course Tracking</p>
+              <div className="min-w-0">
+                <h1 className="truncate text-base font-semibold text-foreground sm:text-lg">Uni Dashboard</h1>
+                <p className="hidden truncate text-xs text-muted-foreground min-[380px]:block">Simple Course Tracking</p>
               </div>
             </div>
             {currentUserEmail && (
-              <div className="flex min-w-0 items-center gap-2 rounded-lg border border-border bg-card px-2.5 py-1.5 sm:gap-3 sm:px-3">
+              <div className="flex min-w-0 shrink items-center gap-1.5 rounded-lg border border-border bg-card px-2 py-1.5 sm:gap-3 sm:px-3">
                 <div className="hidden items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 sm:flex">
                   <Cloud className="h-3.5 w-3.5" />
                   <span>Sync active</span>
                 </div>
                 <div className="h-4 w-px bg-border hidden sm:block" />
-                <span className="max-w-[150px] truncate text-xs text-muted-foreground sm:max-w-[220px]">
+                <span className="max-w-[86px] truncate text-xs text-muted-foreground min-[380px]:max-w-[120px] sm:max-w-[220px]">
                   {currentUserEmail}
                 </span>
                 <Button
@@ -575,8 +575,8 @@ export function Dashboard() {
       </header>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
-        <div className="space-y-8">
+      <main className="mx-auto max-w-7xl px-3 py-4 sm:px-6 sm:py-8 lg:px-8">
+        <div className="space-y-5 sm:space-y-8">
           {!currentUserEmail && (
             <CloudSyncPanel
               cloudSyncEnabled={CLOUD_SYNC_ENABLED}
@@ -610,24 +610,18 @@ export function Dashboard() {
 
           {/* Courses Section */}
           <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-              <h2 className="text-lg font-semibold text-foreground">All Courses</h2>
-              <div className="flex flex-col gap-3 sm:items-end">
-                <Button onClick={openAddDialog}>
-                  <Plus className="h-4 w-4" />
-                  Add Course
-                </Button>
-                <Filters
-                  searchQuery={searchQuery}
-                  setSearchQuery={setSearchQuery}
-                  selectedSemester={selectedSemester}
-                  setSelectedSemester={setSelectedSemester}
-                  selectedStatus={selectedStatus}
-                  setSelectedStatus={setSelectedStatus}
-                  semesters={semesters}
-                />
-              </div>
-            </div>
+            <Filters
+              searchQuery={searchQuery}
+              setSearchQuery={setSearchQuery}
+              selectedSemester={selectedSemester}
+              setSelectedSemester={setSelectedSemester}
+              selectedStatus={selectedStatus}
+              setSelectedStatus={setSelectedStatus}
+              semesters={semesters}
+              visibleCoursesCount={filteredCourses.length}
+              totalCoursesCount={courseList.length}
+              onAddCourse={openAddDialog}
+            />
 
             {effectiveViewMode === "table" ? (
               <CourseTable
@@ -641,17 +635,17 @@ export function Dashboard() {
                 onClearAll={handleClearAllCourses}
               />
             ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4 lg:grid-cols-3">
                 {filteredCourses.map((course) => (
                   <div
                     key={course.id}
-                    className="rounded-xl border border-border bg-card p-4 hover:border-border/80 hover:shadow-sm transition-all"
+                    className="rounded-xl border border-border bg-card p-3 transition-all hover:border-border/80 hover:shadow-sm sm:p-4"
                   >
-                    <div className="flex items-start justify-between gap-2 mb-3">
-                      <h3 className="text-sm font-medium text-foreground line-clamp-2">
+                    <div className="mb-3 flex items-start justify-between gap-2">
+                      <h3 className="min-w-0 text-sm font-medium text-foreground line-clamp-2">
                         {course.name}
                       </h3>
-                      <div className="flex items-start gap-1">
+                      <div className="flex shrink-0 items-start gap-1">
                         <span
                           className={`shrink-0 inline-flex items-center px-2 py-0.5 rounded text-xs font-medium ${
                             course.status === "done"
@@ -668,7 +662,7 @@ export function Dashboard() {
                         />
                       </div>
                     </div>
-                    <div className="flex items-center gap-4 text-xs text-muted-foreground">
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-muted-foreground">
                       <span className="font-mono">{course.semester}</span>
                       <span>{course.credits} ECTS</span>
                       {course.grade && (
@@ -681,10 +675,6 @@ export function Dashboard() {
                 ))}
               </div>
             )}
-
-            <div className="text-center text-sm text-muted-foreground pt-2">
-              Showing {filteredCourses.length} of {courseList.length} courses
-            </div>
           </div>
         </div>
       </main>

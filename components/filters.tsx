@@ -1,6 +1,9 @@
 "use client"
 
-import { Search, Filter, X } from "lucide-react"
+import { Filter, Plus, Search, X } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { Input } from "@/components/ui/input"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
 interface FiltersProps {
   searchQuery: string
@@ -10,6 +13,9 @@ interface FiltersProps {
   selectedStatus: string
   setSelectedStatus: (status: string) => void
   semesters: string[]
+  visibleCoursesCount: number
+  totalCoursesCount: number
+  onAddCourse: () => void
 }
 
 export function Filters({
@@ -20,6 +26,9 @@ export function Filters({
   selectedStatus,
   setSelectedStatus,
   semesters,
+  visibleCoursesCount,
+  totalCoursesCount,
+  onAddCourse,
 }: FiltersProps) {
   const hasFilters = searchQuery || selectedSemester !== "all" || selectedStatus !== "all"
 
@@ -30,55 +39,69 @@ export function Filters({
   }
 
   return (
-    <div className="flex flex-col sm:flex-row gap-3 items-start sm:items-center">
-      <div className="relative flex-1 w-full sm:max-w-xs">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search courses..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-9 rounded-lg border border-input bg-background pl-9 pr-3 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background transition-shadow"
-        />
+    <div className="rounded-xl border border-border bg-card">
+      <div className="flex flex-col gap-3 border-b border-border bg-muted/20 px-3 py-3 sm:flex-row sm:items-center sm:justify-between sm:px-4 sm:py-4">
+        <div className="min-w-0">
+          <h2 className="text-lg font-semibold text-foreground">All Courses</h2>
+          <p className="text-xs text-muted-foreground">
+            Showing {visibleCoursesCount} of {totalCoursesCount} courses
+          </p>
+        </div>
+        <Button onClick={onAddCourse} className="w-full sm:w-auto">
+          <Plus className="h-4 w-4" />
+          Add Course
+        </Button>
       </div>
 
-      <div className="flex items-center gap-2 flex-wrap">
-        <div className="flex items-center gap-1.5 text-muted-foreground">
-          <Filter className="h-4 w-4" />
+      <div className="grid gap-3 px-3 py-3 sm:px-4 sm:py-4 lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-center">
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            type="text"
+            placeholder="Search courses..."
+            value={searchQuery}
+            onChange={(event) => setSearchQuery(event.target.value)}
+            className="bg-background pl-9"
+          />
         </div>
 
-        <select
-          value={selectedSemester}
-          onChange={(e) => setSelectedSemester(e.target.value)}
-          className="h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background transition-shadow cursor-pointer"
-        >
-          <option value="all">All Semesters</option>
-          {semesters.map((sem) => (
-            <option key={sem} value={sem}>
-              {sem}
-            </option>
-          ))}
-        </select>
+        <div className="grid grid-cols-1 gap-2 sm:flex sm:flex-wrap sm:items-center">
+          <div className="hidden h-9 items-center justify-center rounded-md border border-border bg-muted/30 px-2 text-muted-foreground sm:flex">
+            <Filter className="h-4 w-4" />
+          </div>
 
-        <select
-          value={selectedStatus}
-          onChange={(e) => setSelectedStatus(e.target.value)}
-          className="h-9 rounded-lg border border-input bg-background px-3 text-sm focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 focus:ring-offset-background transition-shadow cursor-pointer"
-        >
-          <option value="all">All Status</option>
-          <option value="done">Completed</option>
-          <option value="pending">Pending</option>
-        </select>
+          <Select value={selectedSemester} onValueChange={setSelectedSemester}>
+            <SelectTrigger className="w-full bg-background sm:w-[164px]">
+              <SelectValue placeholder="Semester" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Semesters</SelectItem>
+              {semesters.map((semester) => (
+                <SelectItem key={semester} value={semester}>
+                  {semester}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
 
-        {hasFilters && (
-          <button
-            onClick={clearFilters}
-            className="h-9 px-3 rounded-lg border border-input bg-background text-sm text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors flex items-center gap-1.5"
-          >
-            <X className="h-3.5 w-3.5" />
-            Clear
-          </button>
-        )}
+          <Select value={selectedStatus} onValueChange={setSelectedStatus}>
+            <SelectTrigger className="w-full bg-background sm:w-[144px]">
+              <SelectValue placeholder="Status" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Status</SelectItem>
+              <SelectItem value="done">Completed</SelectItem>
+              <SelectItem value="pending">Pending</SelectItem>
+            </SelectContent>
+          </Select>
+
+          {hasFilters && (
+            <Button variant="outline" onClick={clearFilters} className="w-full sm:w-auto">
+              <X className="h-4 w-4" />
+              Clear
+            </Button>
+          )}
+        </div>
       </div>
     </div>
   )

@@ -16,13 +16,13 @@ export function StatsCards({ stats }: StatsCardsProps) {
     : null
 
   return (
-    <div className="grid grid-cols-1 gap-4 lg:grid-cols-12">
-      <div className="rounded-xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:shadow-sm sm:p-6 lg:col-span-5">
-        <div className="flex items-start justify-between gap-4">
+    <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12">
+      <div className="rounded-xl border border-border bg-card p-4 transition-all hover:border-border/80 hover:shadow-sm sm:p-6 lg:col-span-5">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
           <div className="min-w-0">
             <p className="text-sm font-medium text-muted-foreground">Completed Credits</p>
             <div className="mt-1 flex flex-wrap items-baseline gap-x-2 gap-y-1">
-              <p className="text-4xl font-semibold tracking-tight text-foreground">
+              <p className="text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
                 {stats.completedCredits.toFixed(1)}
               </p>
               <p className="text-sm text-muted-foreground">
@@ -36,7 +36,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
         </div>
 
         <div className="mt-5">
-          <div className="mb-2 flex items-center justify-between text-xs">
+          <div className="mb-2 flex flex-wrap items-center justify-between gap-x-3 gap-y-1 text-xs">
             <span className="font-medium text-emerald-700 dark:text-emerald-300">
               {creditProgress.toFixed(0)}% complete
             </span>
@@ -56,11 +56,11 @@ export function StatsCards({ stats }: StatsCardsProps) {
         </div>
       </div>
 
-      <div className="rounded-xl border border-border bg-card p-5 transition-all hover:border-border/80 hover:shadow-sm sm:p-6 lg:col-span-4">
-        <div className="flex items-start justify-between gap-4">
-          <div>
+      <div className="rounded-xl border border-border bg-card p-4 transition-all hover:border-border/80 hover:shadow-sm sm:p-6 lg:col-span-4">
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
             <p className="text-sm font-medium text-muted-foreground">Average Grade</p>
-            <p className="mt-1 text-4xl font-semibold tracking-tight text-foreground">
+            <p className="mt-1 text-3xl font-semibold tracking-tight text-foreground sm:text-4xl">
               {stats.averageGrade ? stats.averageGrade.toFixed(2) : "—"}
             </p>
             <p className="mt-1 text-xs text-muted-foreground">
@@ -93,8 +93,8 @@ export function StatsCards({ stats }: StatsCardsProps) {
       </div>
 
       <div className="rounded-xl border border-border bg-card p-4 transition-all hover:border-border/80 hover:shadow-sm lg:col-span-3">
-        <div className="flex items-start justify-between gap-4">
-          <div>
+        <div className="flex items-start justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
             <p className="text-sm font-medium text-muted-foreground">Courses Completed</p>
             <p className="mt-1 text-3xl font-semibold tracking-tight text-foreground">
               {stats.completedCourses}
@@ -105,7 +105,7 @@ export function StatsCards({ stats }: StatsCardsProps) {
             <BookOpen className="h-4 w-4 text-blue-500" />
           </div>
         </div>
-        <div className="mt-5 flex items-center gap-2 text-xs">
+        <div className="mt-5 flex flex-wrap items-center gap-2 text-xs">
           <span className="rounded-md bg-emerald-500/10 px-2 py-1 font-medium text-emerald-700 dark:text-emerald-300">
             {stats.completedCourses} done
           </span>

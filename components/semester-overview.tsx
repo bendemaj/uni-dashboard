@@ -59,9 +59,9 @@ export function SemesterOverview({
 
   const renderSemesterRow = (data: (typeof semesterData)[number]) => {
     return (
-      <div key={data.semester} className="px-5 py-4 transition-colors hover:bg-muted/30">
-        <div className="mb-3 flex items-start justify-between gap-4">
-          <div>
+      <div key={data.semester} className="px-4 py-4 transition-colors hover:bg-muted/30 sm:px-5">
+        <div className="mb-3 flex items-start justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
             <span className="text-sm font-medium text-foreground">
               {data.semester === "all" ? "All semesters" : <span className="font-mono">{data.semester}</span>}
             </span>
@@ -74,7 +74,7 @@ export function SemesterOverview({
               )}
             </div>
           </div>
-          <div className="text-right">
+          <div className="shrink-0 text-right">
             <p className="text-lg font-semibold leading-none text-foreground">
               {data.progress.toFixed(0)}%
             </p>
@@ -87,7 +87,7 @@ export function SemesterOverview({
             style={{ width: `${data.progress}%` }}
           />
         </div>
-        <div className="mt-2 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
+        <div className="mt-2 flex flex-col gap-1 text-xs text-muted-foreground min-[420px]:flex-row min-[420px]:items-center min-[420px]:justify-between">
           <span>{data.completedCredits.toFixed(2)} / {data.totalCredits.toFixed(2)} ECTS</span>
           <span>{data.pendingCredits.toFixed(2)} ECTS remaining</span>
         </div>
@@ -97,13 +97,13 @@ export function SemesterOverview({
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
-      <div className="flex flex-col gap-3 border-b border-border px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
+      <div className="flex flex-col gap-3 border-b border-border px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:px-5">
+        <div className="min-w-0">
           <h3 className="text-sm font-medium text-foreground">Study Progress</h3>
         </div>
         <div className="flex items-center gap-2">
           <Select value={currentSemester} onValueChange={onCurrentSemesterChange}>
-            <SelectTrigger className="w-[120px]" size="sm">
+            <SelectTrigger className="w-full min-[420px]:w-[120px]" size="sm">
               <SelectValue placeholder="Semester" />
             </SelectTrigger>
             <SelectContent align="end">

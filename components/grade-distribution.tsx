@@ -19,8 +19,8 @@ export function GradeDistribution({ data }: GradeDistributionProps) {
   const maxCount = Math.max(...data.map((entry) => entry.count), 1)
 
   return (
-    <div className="flex flex-col rounded-xl border border-border bg-card p-5">
-      <div className="mb-4 flex items-center justify-between">
+    <div className="flex flex-col rounded-xl border border-border bg-card p-4 sm:p-5">
+      <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
         <h3 className="text-sm font-medium text-foreground">Grade Distribution</h3>
         <span className="text-xs text-muted-foreground">{totalGraded} graded</span>
       </div>
@@ -32,7 +32,7 @@ export function GradeDistribution({ data }: GradeDistributionProps) {
       ) : (
         <div className="grid gap-2">
           {data.map((entry) => (
-            <div key={entry.key} className="grid grid-cols-[88px_1fr_24px] items-center gap-3 text-xs">
+            <div key={entry.key} className="grid grid-cols-[72px_1fr_24px] items-center gap-2 text-xs sm:grid-cols-[88px_1fr_24px] sm:gap-3">
               <span className="truncate text-muted-foreground">{entry.label}</span>
               <div className="h-2 overflow-hidden rounded-full bg-muted">
                 <div
