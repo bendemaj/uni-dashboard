@@ -252,7 +252,7 @@ export function CourseTable({
           <div className="flex flex-wrap items-center gap-2">
             <p className="text-sm font-medium text-foreground">Course Table</p>
             <span className="rounded-md bg-background px-2 py-0.5 text-xs font-medium text-muted-foreground">
-              {courses.length} rows
+              {courses.length} courses
             </span>
             <span className="rounded-md bg-background px-2 py-0.5 text-xs font-medium text-muted-foreground">
               {visibleCredits.toFixed(1)} ECTS
@@ -528,18 +528,6 @@ export function CourseTable({
                   </Fragment>
                 ))}
               </tbody>
-              <tfoot>
-                <tr className="border-t border-border bg-muted/20">
-                  <td colSpan={6} className="px-4 py-3 text-left">
-                    <span className="text-xs font-medium tracking-wider text-muted-foreground">
-                      Total Credits:
-                    </span>
-                    <span className="ml-3 text-xs font-semibold text-foreground">
-                      {visibleCredits.toFixed(1)} ECTS
-                    </span>
-                  </td>
-                </tr>
-              </tfoot>
             </table>
           </div>
         )}

@@ -693,7 +693,7 @@ export function Dashboard() {
           </p>
           <div className="flex items-center gap-4">
             <a
-              href="https://github.com/bendemaj/student-dashboard"
+              href="https://github.com/bendemaj/uni-dashboard"
               target="_blank"
               rel="noreferrer"
               className="inline-flex items-center gap-1.5 transition-colors hover:text-foreground"
