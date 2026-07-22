@@ -266,15 +266,36 @@ function normalizeRow(row: RawRow) {
   } satisfies Course
 }
 
-function readWorkbook(file: File) {
-  return file.arrayBuffer().then((buffer) =>
-    XLSX.read(buffer, {
-      type: "array",
-      cellDates: false,
-      dateNF: "dd.mm.yyyy",
-      raw: true,
-    }),
+function isDelimitedTextFile(file: File) {
+  const name = file.name.toLowerCase()
+  const type = file.type.toLowerCase()
+
+  return (
+    name.endsWith(".csv") ||
+    name.endsWith(".tsv") ||
+    type.includes("csv") ||
+    type.includes("tab-separated-values")
   )
+}
+
+async function readWorkbook(file: File) {
+  const sharedOptions = {
+    cellDates: false,
+    dateNF: "dd.mm.yyyy",
+    raw: true,
+  } as const
+
+  if (isDelimitedTextFile(file)) {
+    return XLSX.read(await file.text(), {
+      ...sharedOptions,
+      type: "string",
+    })
+  }
+
+  return XLSX.read(await file.arrayBuffer(), {
+    ...sharedOptions,
+    type: "array",
+  })
 }
 
 function findHeaderRowIndex(rows: unknown[][]) {
